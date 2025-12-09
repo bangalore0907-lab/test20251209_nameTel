@@ -2,8 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'webapp',
-      script: 'npm',
-      args: 'run dev',
+      script: 'npx',
+      args: 'tsx src/index-dev.ts',
       env: {
         NODE_ENV: 'development',
         PORT: 3000
