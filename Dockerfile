@@ -1,20 +1,33 @@
-# ベースイメージ
-FROM node:20-alpine
+# ビルドステージ
+FROM node:20-alpine AS builder
 
-# 作業ディレクトリ
 WORKDIR /app
 
-# package.jsonとpackage-lock.jsonをコピー
+# package.jsonをコピー
 COPY package*.json ./
 
-# 依存関係をインストール
-RUN npm ci --only=production
+# 全ての依存関係をインストール（ビルドに必要）
+RUN npm ci
 
 # ソースコードをコピー
 COPY . .
 
 # TypeScriptをビルド
 RUN npm run build
+
+# 本番ステージ
+FROM node:20-alpine
+
+WORKDIR /app
+
+# package.jsonをコピー
+COPY package*.json ./
+
+# 本番用の依存関係のみインストール
+RUN npm ci --only=production
+
+# ビルド済みファイルをコピー
+COPY --from=builder /app/dist ./dist
 
 # ポートを公開
 EXPOSE 10000
